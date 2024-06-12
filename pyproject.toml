@@ -1,0 +1,31 @@
+[project]
+name = "Kasumi"
+version = "0.1.0"
+description = "Starlette-based ASGI Web framework."
+authors = [
+    {name = "AmaseCocoa", email = "amase.cocoa@gmail.com"},
+]
+dependencies = [
+    "starlette>=0.37.2",
+]
+requires-python = ">=3.10"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["setuptools", "wheel", "setuptools_scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "src/kasumi/_version.py"
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.dev-dependencies]
+asgi_dev = [
+    "uvicorn[standard]>=0.30.1",
+]
+lint = [
+    "ruff>=0.4.8",
+]
