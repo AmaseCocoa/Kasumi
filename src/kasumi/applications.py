@@ -27,7 +27,6 @@ class Kasumi:
         self.__err = {}
     
     async def __call__(self, scope, receive, send):
-        print(self.__requests)
         assert scope['type'] == 'http'
         request = Request(scope, receive)
         if self.__requests.get(scope['path']):
