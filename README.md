@@ -16,6 +16,6 @@ pip install https://github.com/AmaseCocoa/Kasumi/archive/develop.zip
 ```
 
 ## Examples
-Examples are available at [Example Directory](https://github.com/AmaseCocoa/Kasumi/blob/release/Example).
+Examples are available at [Example Directory](https://github.com/AmaseCocoa/Kasumi/blob/develop/example).
 ## License
 Kasumi is available under the MIT License.
