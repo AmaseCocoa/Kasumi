@@ -1,12 +1,25 @@
+# Copyright 2024 AmaseCocoa
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     https://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import inspect
 from http.client import responses
 
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse
 
+from .exceptions import AlreadyRegistedError
 
-class AlreadyRegistedError(Exception):
-    pass
 
 class Kasumi:
     def __init__(self) -> None:
@@ -40,21 +53,22 @@ class Kasumi:
             response = PlainTextResponse(resp_msg, status_code=status_code)
             await response(scope, receive, send)
 
-    def route(self, route: str, method: str="GET"):
+    def route(self, route: str, method: list="GET"):
         def decorator(func):
             if isinstance(func, staticmethod):
                 func = func.__func__
             if not inspect.iscoroutinefunction(func):
                 raise TypeError("Routes that listen for requests must be coroutines.")
-            met = method.upper()
-            ev = self.__requests.get(route)
-            if ev is None:
-                self.__requests[route] = {}
+            for m in method:
+                met = m.upper()
                 ev = self.__requests.get(route)
-            else:
-                if ev.get(met) and ev.get(met) != {}:
-                    raise AlreadyRegistedError
-            ev[met] = func
+                if ev is None:
+                    self.__requests[route] = {}
+                    ev = self.__requests.get(route)
+                else:
+                    if ev.get(met) and ev.get(met) != {}:
+                        raise AlreadyRegistedError(f'The function is already registered in the method “{met}” of the route “{route}”.')
+                ev[met] = func
             return func
         return decorator
 
@@ -70,7 +84,7 @@ class Kasumi:
                 ev = self.__requests.get(route)
             else:
                 if ev.get("GET") and ev.get("GET") != {}:
-                    raise AlreadyRegistedError
+                    raise AlreadyRegistedError(f'The function is already registered in the method “GET” of the route “{route}”.')
             ev["GET"] = func
             return func
         return decorator
@@ -87,7 +101,7 @@ class Kasumi:
                 ev = self.__requests.get(route)
             else:
                 if ev.get("POST") and ev.get("POST") != {}:
-                    raise AlreadyRegistedError
+                    raise AlreadyRegistedError(f'The function is already registered in the method “POST” of the route “{route}”.')
             ev["POST"] = func
             return func
         return decorator
@@ -101,7 +115,7 @@ class Kasumi:
             ev = self.__err.get(error_code)
             if ev is not None:
                 if ev and ev != {}:
-                    raise AlreadyRegistedError
+                    raise AlreadyRegistedError(f'The function is already registered in the ErrorCode “{error_code}”.')
             self.__err[error_code] = func
             return func
         return decorator
