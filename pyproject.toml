@@ -1,31 +1,49 @@
 [project]
 name = "Kasumi"
-version = "0.1.0"
 description = "Starlette-based ASGI Web framework."
 authors = [
     {name = "AmaseCocoa", email = "amase.cocoa@gmail.com"},
 ]
 dependencies = [
     "starlette>=0.37.2",
+    "cleo>=2.1.0",
+]
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 requires-python = ">=3.10"
 readme = "README.md"
-license = {text = "MIT"}
+license = {file = "LICENSE"}
+dynamic = ["version"]
 
-[build-system]
-requires = ["setuptools", "wheel", "setuptools_scm>=8.0"]
-build-backend = "setuptools.build_meta"
+[project.scripts]
+kasumi = "src.kasumi.cli.__main__:main"
 
-[tool.setuptools_scm]
-write_to = "src/kasumi/_version.py"
-
-[tool.pdm]
-distribution = true
-
-[tool.pdm.dev-dependencies]
+[project.optional-dependencies]
 asgi_dev = [
     "uvicorn[standard]>=0.30.1",
 ]
 lint = [
     "ruff>=0.4.8",
 ]
+
+[build-system]
+requires = ["setuptools", "wheel", "setuptools_scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "src/kasumi/__version.py"
+version_scheme = "python-simplified-semver"
+local_scheme = "no-local-version"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.dynamic]
+version = {attr = "kasumi.__version.__version__"}
+
+[tool.pdm]
+distribution = true
+
