@@ -29,6 +29,10 @@ lint = [
     "ruff>=0.4.8",
 ]
 
+[project.urls]
+# documentation = "https://kasumi.readthedocs.io/"
+repository = "https://github.com/AmaseCocoa/Kasumi/"
+
 [build-system]
 requires = ["setuptools", "wheel", "setuptools_scm>=8.0"]
 build-backend = "setuptools.build_meta"
@@ -46,4 +50,3 @@ version = {attr = "kasumi.__version.__version__"}
 
 [tool.pdm]
 distribution = true
-
