@@ -6,6 +6,9 @@
 
 Kasumi (“霞” in Japanese Kanji) is an ASGI web server implemented almost from scratch using Starlette as the ASGI toolkit.
 ## Installing
+~~Kasumi is published on PyPI and can be installed with the following command.~~
+> [!IMPORTANT]
+> Kasumi is not currently registered with PyPI. Please check the [following issue](https://github.com/AmaseCocoa/Kasumi/issues/1) for more information.
 ```
 pip install kasumi
 ```
