@@ -1,0 +1,4 @@
+{
+    "files": ["main.py", "requirements.txt", {"dir": "src", "files": ["sub.py"]}],
+    "zip_path": null
+}

@@ -1,5 +1,9 @@
+from importlib.metadata import version
+
 from starlette.requests import Request
 
 from . import responses
-from .__version import __version__, __version_tuple__
 from .applications import Kasumi
+from .gear import Gear
+
+__version__ = version("kasumi")

@@ -8,5 +8,3 @@ app = Kasumi()
 @app.get("/")
 async def root(request: Request):
     return JSONResponse({"Hello": "World"})
-
-print(kasumi.__version__)

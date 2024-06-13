@@ -1,18 +1,39 @@
 import inspect
+from importlib import import_module
+import os
 from http.client import responses
 
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse
 
-from .exceptions import AlreadyRegistedError
-
+from .exceptions import AlreadyRegistedError, GearException
+from .gear import Gear
 
 class Kasumi:
+    
     def __init__(self) -> None:
         self.__requests = {}
         self.__err = {}
     
     async def __call__(self, scope, receive, send):
+        """
+        This function handles incoming HTTP requests by routing them to the appropriate handler based on
+        the request method and path.
+        
+        :param scope: The `scope` parameter in the `__call__` method represents the metadata of the
+        incoming request. It contains information such as the type of the request (e.g., 'http' for HTTP
+        requests), the path of the request, and other details related to the communication channel. In
+        the provided
+        :param receive: The `receive` parameter in the `__call__` method is a callable that is used to
+        receive messages from the client. It is typically an asynchronous function that receives
+        messages from the client connection. In the context of an HTTP server, the `receive` function is
+        used to receive incoming HTTP requests
+        :param send: The `send` parameter in the `__call__` method is a coroutine function that is used
+        to send messages to the client. It is typically used to send HTTP response messages back to the
+        client. The `send` function takes a single argument, which is a dictionary representing the
+        message to be
+        """
+        
         assert scope['type'] == 'http'
         request = Request(scope, receive)
         if self.__requests.get(scope['path']):
@@ -104,3 +125,32 @@ class Kasumi:
             self.__err[error_code] = func
             return func
         return decorator
+    
+    def combine_route(self, route: dict, name: str, routeType: str="normal"):
+        if routeType == "normal":
+            self.__requests[name] = route
+        elif routeType == "err":
+            self.__err[name] = route
+    
+    def include_gear(self, module: Gear):
+        route = module._requests
+        for k in route.keys():
+            if self.__requests.get(k):
+                for router in route[k].keys():
+                    if self.__requests[k].get(router):
+                        raise GearException(f"""The Route "{k}" registered in the gear has another function registered""")
+            else:
+                self.combine_route(
+                    route[k], k
+                )
+        del k
+        err = module._err
+        for k in err.keys():
+            if self.__err.get(k):
+                for error in err[k].keys():
+                    if self.__requests[k].get(error):
+                        raise GearException(f"""The Route "{k}" registered in the gear has another function registered""")
+            else:
+                self.combine_route(
+                    err[k], k
+                )
