@@ -28,21 +28,15 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-      
-      - name: Create or switch to release branch
-        run: |
-          git checkout -B release
-      - name: Copy files from tag
-        run: |
-          TAG_NAME=$(git describe --tags --abbrev=0)
-          git checkout $TAG_NAME -- .
-      - name: Commit changes
-        run: |
-          git add -A
-          git commit -m "Update release branch to $TAG_NAME"
-      - name: Push to release branch
-        run: |
-          git push origin release --force
+      - name: Get current tag name
+        id: get_tag
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Checkout release branch
+        run: git checkout release
+      - name: Merge tag to release branch
+        run: git merge ${{ env.TAG_NAME }} --no-ff -m "Release v${{ env.TAG_NAME }}"
+      - name: Push changes to release branch
+        run: git push origin release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: echo version
