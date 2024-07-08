@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - release
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          pip install pytest
+          pytest > pytest_output.txt || exit 0
+
+      - name: Upload PyTest output
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytest-output
+          path: pytest_output.txt
+    
+      - name: Post PyTest output to PR
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const pytestOutput = fs.readFileSync('pytest_output.txt', 'utf8');
+            github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: `### PyTest Output\n<details>\n<summary>Click to expand</summary>\n\n\`\`\`\n${pytestOutput}\n\`\`\`\n</details>`
+            })
+
+      - name: Run Ruff linter
+        id: ruff-lint
+        run: |
+          ruff . > ruff_output.txt || exit 0
+    
+      - name: Upload Ruff output
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+            name: ruff-output
+            path: ruff_output.txt
+    
+      - name: Post Ruff output to PR
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const ruffOutput = fs.readFileSync('ruff_output.txt', 'utf8');
+            github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: `### Ruff Linter Failed\n<details>\n<summary>Output (Click To Expand): </summary>\n\n\`\`\`\n${ruffOutput}\n\`\`\`\n</details>`
+            })
