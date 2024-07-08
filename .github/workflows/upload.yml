@@ -16,29 +16,6 @@ jobs:
         id-token: write
     steps:
       - uses: actions/checkout@v4
-      - name: "Set env"
-        run: |
-          if [ -n "${{ github.event.inputs.version }}" ]; then
-            echo "RELEASE_VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-            git tag ${{ github.event.inputs.version }}
-          else
-            echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-          fi
-      - name: Set up Git
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-      - name: Get current tag name
-        id: get_tag
-        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-      - name: Checkout release branch
-        run: git checkout release
-      - name: Merge tag to release branch
-        run: git merge ${{ env.TAG_NAME }} --no-ff -m "Release v${{ env.TAG_NAME }}"
-      - name: Push changes to release branch
-        run: git push origin release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: echo version
         run: |
           echo $RELEASE_VERSION
