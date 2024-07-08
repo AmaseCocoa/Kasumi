@@ -1,5 +1,5 @@
 # Kasumi
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff) [![image](https://img.shields.io/pypi/v/kasumi.svg)](https://pypi.python.org/pypi/kasumi) [![image](https://img.shields.io/pypi/pyversions/kasumi.svg)](https://pypi.python.org/pypi/kasumi)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff) [![image](https://img.shields.io/pypi/v/kasumi-web.svg)](https://pypi.python.org/pypi/kasumi-web) [![image](https://img.shields.io/pypi/pyversions/kasumi-web.svg)](https://pypi.python.org/pypi/kasumi-web)
 
 > [!WARNING]
 > Kasumi is in a very early development stage. Do not use it in a production environment.
@@ -13,7 +13,10 @@ Kasumi (“霞” in Japanese Kanji) is an ASGI web server implemented almost fr
 pip install kasumi
 ```
 > [!NOTE]
-> Installation via PyPI is now possible by acquiring the Kasumi-web namespace.
+> Installation via PyPI is now possible by acquiring the `Kasumi-web` namespace.
+> ```
+> pip install kasumi-web
+> ```
 
 #### If install the latest development version: 
 ```
