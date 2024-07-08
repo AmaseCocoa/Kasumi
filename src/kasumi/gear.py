@@ -9,7 +9,7 @@ class Gear:
         self._requests = {}
         self._err = {}
         
-    def route(self, route: str, method: list="GET"):
+    def route(self, route: str, method: list=["GET", "POST"]):
         def decorator(func):
             APIRoute = self.__prefix + route
             if isinstance(func, staticmethod):
