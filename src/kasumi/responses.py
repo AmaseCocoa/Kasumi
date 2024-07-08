@@ -8,12 +8,7 @@ from starlette.responses import RedirectResponse as RedirectResponse
 from starlette.responses import Response
 from starlette.responses import StreamingResponse as StreamingResponse
 
-try:
-    import orjson
-    orjson_available = True
-except ModuleNotFoundError:
-    import json
-    orjson_available = False
+import json
 
 class JSONResponse(Response):
     media_type = "application/json"
@@ -28,29 +23,13 @@ class JSONResponse(Response):
         use_orjson: bool = True
     ) -> None:
         super().__init__(content, status_code, headers, media_type, background)
-        self.use_orjson = use_orjson
 
     def render(self, content: typing.Any) -> bytes:
-        if self.use_orjson:
-            if orjson_available:
-                dp = orjson.dumps(
-                    content, 
-                    option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SERIALIZE_NUMPY
-                )
-            else:
-                dp = json.dumps(
-                    content,
-                    ensure_ascii=False,
-                    allow_nan=False,
-                    indent=None,
-                    separators=(",", ":"),
-                ).encode("utf-8")
-        else:
-            dp = json.dumps(
-                content,
-                ensure_ascii=False,
-                allow_nan=False,
-                indent=None,
-                separators=(",", ":"),
-            ).encode("utf-8")
+        dp = json.dumps(
+            content,
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=None,
+            separators=(",", ":"),
+        ).encode("utf-8")
         return dp
