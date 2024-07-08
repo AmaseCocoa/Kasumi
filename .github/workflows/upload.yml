@@ -12,7 +12,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    environment: pulblish to pypi
     permissions:
+        contents: read
         id-token: write
     steps:
       - uses: actions/checkout@v4
