@@ -12,6 +12,8 @@ Kasumi (“霞” in Japanese Kanji) is an ASGI web server implemented almost fr
 ```
 pip install kasumi
 ```
+> [!NOTE]
+> Installation via PyPI is now possible by acquiring the Kasumi-web namespace.
 
 #### If install the latest development version: 
 ```
