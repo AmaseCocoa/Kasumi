@@ -33,6 +33,7 @@ class Kasumi:
         """
         
         if scope['type'] == 'http':
+            handler = None
             request = Request(scope, receive)
             if self.__requests.get(scope['path']):
                 req: dict = self.__requests[scope['path']]
@@ -52,7 +53,10 @@ class Kasumi:
                     await self.__handle_err(request, scope, receive, send, 405)
                 else:
                     response = await handler(request)
-    
+                    await response(scope, receive, send)
+            else:
+                await self.__handle_err(request, scope, receive, send, 404)
+
     async def __handle_err(self, request, scope, receive, send, status_code: int=404):
         if self.__err.get(status_code):
             func: dict = self.__err[status_code]
