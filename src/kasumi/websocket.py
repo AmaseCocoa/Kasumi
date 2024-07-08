@@ -38,16 +38,21 @@ class WebSocket:
             "text": pyjson.dumps(data, ensure_ascii=False)
         })
         
-    async def recv(self) -> str | None:
+    async def recv(self) -> WSMessage | None:
         message = await self.receive()
         if message["type"] == "websocket.disconnect":
             raise ConnectionClosed
         elif message["type"] == "websocket.connect":
             return None
-        try:
-            text = pyjson.loads(message["text"])
-        except pyjson.JSONDecodeError:
-            text = None
-        if message["type"] == "websocket.receive":
-            return WSMessage(text=message["text"], json=text)
-        raise RuntimeError("Unexpected message type")
+        elif message["type"] == "websocket.receive":
+            try:
+                text = pyjson.loads(message["text"])
+            except pyjson.JSONDecodeError:
+                text = None
+            if message["type"] == "websocket.receive":
+                return WSMessage(
+                    text=message["text"], 
+                    json=text
+                )
+        else:
+            raise RuntimeError("Unexpected message type: " + message["type"])
