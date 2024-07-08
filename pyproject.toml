@@ -1,5 +1,5 @@
 [project]
-name = "Kasumi"
+name = "Kasumi-web"
 description = "Another ASGI Web framework."
 authors = [
     {name = "AmaseCocoa", email = "amase.cocoa@gmail.com"},
@@ -17,12 +17,13 @@ license = {file = "LICENSE"}
 dynamic = ["version"]
 
 [project.optional-dependencies]
-asgi_dev = [
-    "uvicorn[standard]>=0.30.1",
-]
+
 test = [
     "pytest>=8.2.2",
     "ruff>=0.4.8",
+    "httpx>=0.27.0",
+    "uvicorn>=0.30.1",
+    "pytest-asyncio>=0.23.7",
 ]
 
 [project.scripts]
