@@ -1,6 +1,4 @@
 import inspect
-from importlib import import_module
-import os
 from http.client import responses
 
 from starlette.requests import Request
@@ -44,6 +42,17 @@ class Kasumi:
                     await response(scope, receive, send)
                 else:
                     await self.__handle_err(request, scope, receive, send, status_code=405)
+                await self.__handle_err(request, scope, receive, send, status_code=404)
+            elif self.__requests.get(request.base_url.hostname):
+                if self.__requests[request.base_url.hostname].get(scope['path']):
+                    req: dict = self.__requests[request.base_url.hostname][scope['path']]
+                    if req.get(request.method):
+                        func = req.get(request.method)
+                        response = await func(request)
+                        await response(scope, receive, send)
+                    else:
+                        await self.__handle_err(request, scope, receive, send, status_code=405)
+                    await self.__handle_err(request, scope, receive, send, status_code=404)
             else:
                 await self.__handle_err(request, scope, receive, send, status_code=404)
     
@@ -126,31 +135,54 @@ class Kasumi:
             return func
         return decorator
     
-    def combine_route(self, route: dict, name: str, routeType: str="normal"):
-        if routeType == "normal":
-            self.__requests[name] = route
-        elif routeType == "err":
-            self.__err[name] = route
+    def combine_route(self, route: dict, name: str, routeType: str="normal", host: str=None):
+        if host is None:
+            if routeType == "normal":
+                self.__requests[name] = route
+            elif routeType == "err":
+                self.__err[name] = route
+        else:
+            if routeType == "normal":
+                self.__requests[host][name] = route
+            elif routeType == "err":
+                self.__err[host][name] = route
     
-    def include_gear(self, module: Gear):
-        route = module._requests
-        for k in route.keys():
-            if self.__requests.get(k):
-                for router in route[k].keys():
-                    if self.__requests[k].get(router):
-                        raise GearException(f"""The Route "{k}" registered in the gear has another function registered""")
+    def include_gear(self, module: Gear, host: str=None):
+        if host is None:
+            route = module._requests
+            for k in route.keys():
+                if self.__requests.get(k):
+                    for router in route[k].keys():
+                        if self.__requests[k].get(router):
+                            raise GearException(f"""The Route "{k}" registered in the gear has another function registered""")
+                else:
+                    self.combine_route(
+                        route[k], k
+                    )
+            del k
+            err = module._err
+            for k in err.keys():
+                if self.__err.get(k):
+                    for error in err[k].keys():
+                        if self.__requests[k].get(error):
+                            raise GearException(f"""The Route "{k}" registered in the gear has another function registered""")
+                else:
+                    self.combine_route(
+                        err[k], k
+                    )
+        else:
+            if self.__requests.get(host):
+                raise GearException(f"""Another gear is registered to the requested host "{k}".""")
             else:
-                self.combine_route(
-                    route[k], k
-                )
-        del k
-        err = module._err
-        for k in err.keys():
-            if self.__err.get(k):
-                for error in err[k].keys():
-                    if self.__requests[k].get(error):
-                        raise GearException(f"""The Route "{k}" registered in the gear has another function registered""")
-            else:
-                self.combine_route(
-                    err[k], k
-                )
+                route = module._requests
+                self.__requests[host] = {}
+                route_host = self.__requests[host]
+                for k in route.keys():
+                    if route_host.get(k):
+                        for router in route[k].keys():
+                            if route_host[k].get(router):
+                                raise GearException(f"""The Route "{k}" (on {host}) registered in the gear has another function registered""")
+                    else:
+                        self.combine_route(
+                            route[k], k, host=host
+                        )
