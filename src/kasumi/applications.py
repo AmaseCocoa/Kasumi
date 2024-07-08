@@ -36,25 +36,22 @@ class Kasumi:
             request = Request(scope, receive)
             if self.__requests.get(scope['path']):
                 req: dict = self.__requests[scope['path']]
-                if req.get(request.method):
-                    func = req.get(request.method)
-                    response = await func(request)
-                    await response(scope, receive, send)
-                else:
-                    await self.__handle_err(request, scope, receive, send, status_code=405)
+                handler = req.get(request.method)
+                if handler is None:
+                    handler = 405
             elif self.__requests.get(request.base_url.hostname):
                 if self.__requests[request.base_url.hostname].get(scope['path']):
                     req: dict = self.__requests[request.base_url.hostname][scope['path']]
-                    if req.get(request.method):
-                        func = req.get(request.method)
-                        response = await func(request)
-                        await response(scope, receive, send)
-                    else:
-                        await self.__handle_err(request, scope, receive, send, status_code=405)
+                    handler = req.get(request.method)
+                    if handler is None:
+                        handler = 405
                 else:
-                    await self.__handle_err(request, scope, receive, send, status_code=404)
-            else:
-                await self.__handle_err(request, scope, receive, send, status_code=404)
+                    handler = None
+            if handler:
+                if isinstance(handler, int):
+                    await self.__handle_err(request, scope, receive, send, 405)
+                else:
+                    response = await handler(request)
     
     async def __handle_err(self, request, scope, receive, send, status_code: int=404):
         if self.__err.get(status_code):
