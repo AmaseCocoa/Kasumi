@@ -1,5 +1,6 @@
 [project]
-name = "Kasumi-web"
+name = "kasumi-web"
+# version = "0.0.0"
 description = "Another ASGI Web framework."
 authors = [
     {name = "AmaseCocoa", email = "amase.cocoa@gmail.com"},
@@ -10,6 +11,8 @@ dependencies = [
     "requests>=2.32.3",
     "tqdm>=4.66.4",
     "cowsay>=6.1",
+    "pydantic>=2.8.2",
+    "yarl>=1.9.4",
 ]
 requires-python = ">=3.10"
 readme = "README.md"
@@ -33,12 +36,16 @@ kasumi = "kasumi.cli.__core:app"
 # documentation = "https://kasumi.readthedocs.io/"
 repository = "https://github.com/AmaseCocoa/Kasumi/"
 
+[tool.pdm]
+distribution = true
+
 [tool.pdm.version]
+fallback_version = "0.0.0"
 source = "scm"
 
+[tool.pdm.dev-dependencies]
+"uvicorn[standard]" = []
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
-[tool.pdm]
-distribution = true
