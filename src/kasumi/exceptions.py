@@ -3,3 +3,6 @@ class AlreadyRegistedError(Exception):
 
 class GearException(Exception):
     pass
+
+class ConnectionClosed(Exception):
+    pass
