@@ -1,9 +1,13 @@
 name: Pulblish to PyPI
 
 on:
-  push:
-    tags:
-      - "v*"
+  release: 
+    types: [released]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version'
+        required: true
 
 jobs:
   release:
@@ -11,54 +15,40 @@ jobs:
     permissions:
         id-token: write
     steps:
-      - name: checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Get diff from CHANGELOG
+      - uses: actions/checkout@v4
+      - name: "Set env"
         run: |
-          BEFORE=`git describe --tags v${GITHUB_REF#refs/*/v}^^`
-          echo 'CHANGELOG<<EOF' >> $GITHUB_ENV
-          git diff -u $BEFORE CHANGELOG.md | grep ^+ | grep -v ^+++ | sed s/^+// >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
-
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.RELEASE_VERSION }}
-          name: Release ${{ env.RELEASE_VERSION }}
-          body: ${{ env.CHANGELOG }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "RELEASE_VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+            git tag ${{ github.event.inputs.version }}
+          else
+            echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+          fi
       - name: Set up Git
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-    
+      
       - name: Create or switch to release branch
         run: |
           git checkout -B release
-
       - name: Copy files from tag
         run: |
           TAG_NAME=$(git describe --tags --abbrev=0)
           git checkout $TAG_NAME -- .
-    
       - name: Commit changes
         run: |
           git add -A
           git commit -m "Update release branch to $TAG_NAME"
-    
       - name: Push to release branch
         run: |
           git push origin release --force
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: echo version
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ env.RELEASE_VERSION }}
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
