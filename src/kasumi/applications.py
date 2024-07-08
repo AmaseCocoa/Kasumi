@@ -42,7 +42,6 @@ class Kasumi:
                     await response(scope, receive, send)
                 else:
                     await self.__handle_err(request, scope, receive, send, status_code=405)
-                await self.__handle_err(request, scope, receive, send, status_code=404)
             elif self.__requests.get(request.base_url.hostname):
                 if self.__requests[request.base_url.hostname].get(scope['path']):
                     req: dict = self.__requests[request.base_url.hostname][scope['path']]
@@ -52,6 +51,7 @@ class Kasumi:
                         await response(scope, receive, send)
                     else:
                         await self.__handle_err(request, scope, receive, send, status_code=405)
+                else:
                     await self.__handle_err(request, scope, receive, send, status_code=404)
             else:
                 await self.__handle_err(request, scope, receive, send, status_code=404)
