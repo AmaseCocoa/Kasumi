@@ -1,3 +1,5 @@
+**This project has been archived. If you are interested in rewritted version, try [Notturno](https://github.com/AmaseCocoa/Notturno)**
+
 # Kasumi
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff) [![image](https://img.shields.io/pypi/v/kasumi-web.svg)](https://pypi.python.org/pypi/kasumi-web) [![image](https://img.shields.io/pypi/pyversions/kasumi-web.svg)](https://pypi.python.org/pypi/kasumi-web)
 
